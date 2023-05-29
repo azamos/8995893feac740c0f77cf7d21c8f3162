@@ -14,3 +14,12 @@
     font-size: 30px;
     text-align: center;
   }
+  .flex-center{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .invisible{
+    display: none;
+  }
