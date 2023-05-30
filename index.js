@@ -64,6 +64,42 @@ function main(){
 }
 
 function pupulateBoard(numOfPairs){
+    const { cards } = gameState;
+    const unAssignedImages = new Set();//So that we could get a random image from a pool of images previousely NOT selected.
+    let i;
+    const n = 2*numOfPairs;
+    //Populating the set with all of the images
+    for(i=0;i<numOfImages;i++){
+        unAssignedImages.add(i);
+    }
+
+    const unAssingedIndexes = new Set();//To be able to pick available indexes
+    //Populating the set with all the indexes
+    for(i=0;i<2*numOfPairs;i++){
+        unAssingedIndexes.add(i);
+    }
+    let assignedAmount = 0;//We need to asign numOfPairs pairs, meaning we need to roll 2 random indexes to be pair partners, and 1 additional number
+    //for an image.
+    while(assignedAmount<numOfPairs){
+        let index1 = findAvailableRandomIndex(unAssingedIndexes);
+        let index2 = findAvailableRandomIndex(unAssingedIndexes);
+        let image = findAvailableRandomIndex(unAssignedImages);
+        cards[index1] = {otherCardIndex:index2,value:image+1};
+        cards[index2] = {otherCardIndex:index1,value:image+1};
+        assignedAmount++;
+    }
+    populateHTML(document.getElementById("gameBoard"));
+}
+
+function findAvailableRandomIndex(set){
+    const arr = Array.from(set);
+    let ranomIndex = Math.floor(Math.random()*arr.length);
+    set.delete(arr[ranomIndex]);
+    return arr[ranomIndex]; 
+}
+
+/**
+ * function pupulateBoard(numOfPairs){
     const  n = 2*numOfPairs;
     const availableImages = new Array(numOfImages);
     for(let j = 0; j < numOfImages; j++){
@@ -91,6 +127,7 @@ function pupulateBoard(numOfPairs){
     }
     populateHTML(document.getElementById("gameBoard"));
 }
+ */
 
 function populateHTML(anchor){
     gameState.cards.map(cardData=> {
