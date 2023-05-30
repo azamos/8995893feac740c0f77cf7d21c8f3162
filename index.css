@@ -32,6 +32,14 @@
   color: white;
 }
 
+.lost{
+  background-color: red;
+}
+
+.orangebg{
+  background-color: orange;
+}
+
 .shiny {
   background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 20%, rgba(255, 255, 255, 0.8) 40%, #ECD08C 50%, #ECD08C 55%, rgba(255, 255, 255, 0.8) 70%, rgba(255, 255, 255, 0.8) 100%);
   background-size: 200% auto;
@@ -51,4 +59,16 @@
   -webkit-text-stroke: 1px black;
   -webkit-text-fill-color: white;
   font-size: xx-large;
+}
+
+.btn-drk{
+  background-color: black;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+}
+.btn-ply{
+  background-color: #ECD08C;
+  padding: 10px;
+  border-radius: 10px;
 }

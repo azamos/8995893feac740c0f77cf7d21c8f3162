@@ -1,6 +1,6 @@
 const GAME_MODE = 'GAME_MODE';
 const REG_MODE = 'REG_MODE';
-const DEFAULT_CARD_NUM = 10;
+const DEFAULT_CARD_NUM = 1;
 const DEFAULT_REMAINING_TIME = 60;//seconds
 const DEFAULT_OBSERVANCE_PREIOD = 2;//seconds
 const milisecToSecond = 1000;
@@ -24,7 +24,8 @@ const gameState = {
     remainingSeconds: DEFAULT_REMAINING_TIME,
     cards:[],
     currentlySelectedCard: null,
-    intervalId: null
+    intervalId: null,
+    remainingPairs: 0
 }
 
 function resetGameState(){
@@ -32,6 +33,7 @@ function resetGameState(){
     gameState.cards = [];
     gameState.currentlySelectedCard=null;
     gameState.intervalId = null;
+    gameState.remainingPairs = 0;
 }
 
 const appMod = {
@@ -75,6 +77,10 @@ function setVisible(){
 function startGame(){
     appMod.gameState = GAME_MODE;
     pupulateBoard(regState.cardsInput);
+    gameState.remainingPairs = regState.cardsInput;
+    document.getElementById('counterDiv').classList.remove('shiny');
+    document.getElementById('counterDiv').classList.remove('lost');
+    document.getElementById('counterDiv').classList.add('orangebg');
     setVisible();
 }
 
@@ -89,7 +95,7 @@ function main(){
     });
     const cardInputRef = document.getElementById("cards");
     
-    cardInputRef.value = 10;
+    cardInputRef.value = DEFAULT_CARD_NUM;
     cardInputRef.addEventListener('input',e=>{
         if(1<=e.target.value && e.target.value<=30){
             regState.cardsInput = e.target.value;
@@ -129,12 +135,6 @@ function pupulateBoard(numOfPairs){
     populateHTML(gameBoard);
     const tiId = setTimeout(()=>initiateGameplay(counterDiv),setTimeForInterval(DEFAULT_OBSERVANCE_PREIOD));
     timeOuts.push(tiId);
-    /*
-    *const sortedIndexes =[];
-    cards.map(card=>sortedIndexes.push(card.otherCardIndex));
-    sortedIndexes.sort((a,b)=>a>b);
-    console.log(sortedIndexes);
-    */
 }
 function initiateGameplay(counterDiv){
     const { cards } = gameState;
@@ -143,8 +143,29 @@ function initiateGameplay(counterDiv){
         card.htmlRef.addEventListener('click',cardClick);});
     gameState.intervalId = setInterval(()=>{
         gameState.remainingSeconds = gameState.remainingSeconds>0? gameState.remainingSeconds-1:0;
-        counterDiv.innerHTML=`<span><h1>Game started. Remaining Time: ${gameState.remainingSeconds} seconds<h1></span>`;
+        counterDiv.innerHTML=`<span><h1>User: ${regState.nameInput}.Game started. Remaining Time: ${gameState.remainingSeconds} seconds<h1></span>`;
+        if(gameState.remainingSeconds==0&&gameState.remainingPairs>0){
+            endGame();
+        }
     },setTimeForInterval(1));
+}
+
+function endGame(){
+    clearInterval(gameState.intervalId);
+    const { remainingPairs } = gameState;
+    const message = 
+    remainingPairs==0 ?
+     `Congratulations ${regState.nameInput}! You have WON the game! It took you ${DEFAULT_REMAINING_TIME - gameState.remainingSeconds} seconds`:
+     `${regState.nameInput}, YOU LOST! Time ran out. There are ${gameState.remainingPairs} pair of cards yet to be discovered`;
+    const counterDiv = document.getElementById('counterDiv');
+    counterDiv.innerHTML = `<span><h1>${message}<h1></span>`;
+    if(remainingPairs==0){
+        counterDiv.classList.add('shiny');
+    }
+    else{
+        counterDiv.classList.add('lost');
+    }
+    
 }
 
 function findAvailableRandomIndex(set){
@@ -158,12 +179,10 @@ function findAvailableRandomIndex(set){
 function populateHTML(anchor){
     gameState.cards.map((cardData,index)=> {
         const newCard = document.createElement('div');
-        //newCard.innerHTML = `OTHER CARD: ${cardData.otherCardIndex}`;
         newCard.classList.add("grid-item");
         newCard.classList.add("card");
         newCard.style = `background-image: url('./images/image${cardData.value}.jpg');`;
         newCard.setAttribute('id',`card-index ${index}`);
-        //newCard.addEventListener('click',cardClick);
         anchor.appendChild(newCard);
         cardData.htmlRef = newCard;
     });
@@ -179,9 +198,13 @@ function cardClick(e){
         card.htmlRef.style = `background-image: url('./images/image${card.value}.jpg');`;
         currentlySelectedCard.discovered = true;
         card.discovered = true;
+        gameState.remainingPairs-=1;
     }
     gameState.currentlySelectedCard = card;
     showCardForAwhile(gameState.currentlySelectedCard);
+    if(gameState.remainingPairs==0){
+        endGame();
+    }
 }
 
 function showCardForAwhile(card){
