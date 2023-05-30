@@ -1,25 +1,48 @@
 .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 200px);
-    background-color: #2196F3;
-    padding: 10px;
-    justify-content: center;
-    gap: 10px;
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 200px);
+  background-color: #2196F3;
+  padding: 10px;
+  justify-content: center;
+  gap: 10px;
+}
 
-  .grid-item {
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    font-size: 30px;
-    text-align: center;
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.flex-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.invisible {
+  display: none;
+}
+
+.card {
+  background-size: cover;
+  height: 10vh;
+  color: white;
+}
+
+.shiny {
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.8) 20%, rgba(255, 255, 255, 0.8) 40%, #ECD08C 50%, #ECD08C 55%, rgba(255, 255, 255, 0.8) 70%, rgba(255, 255, 255, 0.8) 100%);
+  background-size: 200% auto;
+  animation: shine 3s linear infinite;
+  border: #ECD08C solid 1px;
+}
+
+/*Begin shimmer code*/
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
   }
-  .flex-center{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-  }
-  .invisible{
-    display: none;
-  }
+}
