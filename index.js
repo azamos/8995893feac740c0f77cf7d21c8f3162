@@ -23,18 +23,14 @@ function resetRegState(){
 const gameState = {
     remainingSeconds: DEFAULT_REMAINING_TIME,
     cards:[],
-    selectedMode:0,
-    selectedCard1:null,
-    selectedCard2:null,
+    currentlySelectedCard: null,
     intervalId: null
 }
 
 function resetGameState(){
     gameState.remainingSeconds = DEFAULT_REMAINING_TIME;
     gameState.cards = [];
-    gameState.selectedMode = 0;
-    gameState.selectedCard1 = null;
-    gameState.selectedCard2 = null;
+    gameState.currentlySelectedCard=null;
     gameState.intervalId = null;
 }
 
@@ -174,27 +170,18 @@ function populateHTML(anchor){
 }
 
 function cardClick(e){
-    const { cards } = gameState;
+    const {cards,currentlySelectedCard} = gameState;
     const cardHTMLref = e.target;
     const index = parseInt(cardHTMLref.id.split(" ")[1]);
-    let card = cards[index];
-    showCardForAwhile(card);
-    
-    let {selectedMode} = gameState;//Either a first card was picked already, or not.
-    if(selectedMode==0){
-        gameState.selectedCard1 = card;
+    const card = cards[index];
+    if(currentlySelectedCard!=null&& cards[currentlySelectedCard.otherCardIndex] == card){
+        currentlySelectedCard.htmlRef.style = `background-image: url('./images/image${currentlySelectedCard.value}.jpg');`;
+        card.htmlRef.style = `background-image: url('./images/image${card.value}.jpg');`;
+        currentlySelectedCard.discovered = true;
+        card.discovered = true;
     }
-    if(selectedMode==1){//Means, a first card was picked previously
-        gameState.selectedCard2 = card;
-        const {cards,selectedCard1,selectedCard2} = gameState;
-        if(cards[selectedCard1.otherCardIndex] == selectedCard2){
-            selectedCard1.htmlRef.style = `background-image: url('./images/image${selectedCard1.value}.jpg');`;
-            selectedCard2.htmlRef.style = `background-image: url('./images/image${selectedCard2.value}.jpg');`;
-            selectedCard1.discovered = true;
-            selectedCard2.discovered = true;
-        }
-    }
-    gameState.selectedMode = (selectedMode+1)%2;
+    gameState.currentlySelectedCard = card;
+    showCardForAwhile(gameState.currentlySelectedCard);
 }
 
 function showCardForAwhile(card){
