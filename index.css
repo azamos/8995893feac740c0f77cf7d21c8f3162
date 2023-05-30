@@ -28,7 +28,7 @@
 
 .card {
   background-size: cover;
-  height: 10vh;
+  height: 15vh;
   color: white;
 }
 
@@ -45,4 +45,10 @@
   to {
     background-position: 200% center;
   }
+}
+
+.outlinedText{
+  -webkit-text-stroke: 1px black;
+  -webkit-text-fill-color: white;
+  font-size: xx-large;
 }

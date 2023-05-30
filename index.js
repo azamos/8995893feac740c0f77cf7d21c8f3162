@@ -70,6 +70,7 @@ function main(){
 function pupulateBoard(numOfPairs){
     const { cards } = gameState;
     const unAssignedImages = new Set();//So that we could get a random image from a pool of images previousely NOT selected.
+    const gameBoard = document.getElementById("gameBoard");
     let i;
     const n = 2*numOfPairs;
     //Populating the set with all of the images
@@ -94,9 +95,11 @@ function pupulateBoard(numOfPairs){
     }
     const counterDiv = document.createElement('div');
     counterDiv.setAttribute('id','remaining-time');
-    counterDiv.innerHTML=`Remaining Time${gameState.remainingSeconds}`;
-    gameBoard.appendChild(counterDiv);
-    populateHTML(document.getElementById("gameBoard"));
+    counterDiv.classList.add('outlinedText');
+    counterDiv.classList.add('flex-center');
+    counterDiv.innerHTML=`<span><h1>Observe the cards before they disappear</h1></span>`;
+    document.getElementById("gameContainer").insertBefore(counterDiv,gameBoard);
+    populateHTML(gameBoard);
     setTimeout(()=>initiateGameplay(counterDiv),setTimeForInterval(DEFAULT_OBSERVANCE_PREIOD));
     /*
     *const sortedIndexes =[];
@@ -112,7 +115,7 @@ function initiateGameplay(counterDiv){
         card.htmlRef.addEventListener('click',cardClick);});
     setInterval(()=>{
         gameState.remainingSeconds = gameState.remainingSeconds>0? gameState.remainingSeconds-1:0;
-        counterDiv.innerHTML=`Remaining Time${gameState.remainingSeconds}`;
+        counterDiv.innerHTML=`<span><h1>Game started. Remaining Time: ${gameState.remainingSeconds} seconds<h1></span>`;
     },setTimeForInterval(1));
 }
 
@@ -153,9 +156,8 @@ function cardClick(e){
         gameState.selectedCard2 = card;
         const {cards,selectedCard1,selectedCard2} = gameState;
         if(cards[selectedCard1.otherCardIndex] == selectedCard2){
-            alert("SUCCESS! + points!");
-            card.htmlRef.parentElement.removeChild(selectedCard1.htmlRef);
-            card.htmlRef.parentElement.removeChild(selectedCard2.htmlRef);
+            selectedCard1.htmlRef.style = `background-image: url('./images/image${selectedCard1.value}.jpg');`;
+            selectedCard2.htmlRef.style = `background-image: url('./images/image${selectedCard2.value}.jpg');`;
         }
     }
     gameState.selectedMode = (selectedMode+1)%2;
