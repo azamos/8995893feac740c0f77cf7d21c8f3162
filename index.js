@@ -6,6 +6,7 @@ const DEFAULT_OBSERVANCE_PREIOD = 2;//seconds
 const milisecToSecond = 1000;
 const numOfImages = 30;
 const setTimeForInterval = timeInSec => timeInSec*milisecToSecond;
+let timeOuts = [];
 
 const regState = {
     nameInput:"",
@@ -24,7 +25,8 @@ const gameState = {
     cards:[],
     selectedMode:0,
     selectedCard1:null,
-    selectedCard2:null
+    selectedCard2:null,
+    intervalId: null
 }
 
 function resetGameState(){
@@ -33,6 +35,7 @@ function resetGameState(){
     gameState.selectedMode = 0;
     gameState.selectedCard1 = null;
     gameState.selectedCard2 = null;
+    gameState.intervalId = null;
 }
 
 const appMod = {
@@ -43,11 +46,17 @@ function resetAppMod(){
     appMod.gameState = REG_MODE;
 }
 
-function resetGame(){
+function resetGame(nameInputRef,cardInputRef){
+    clearInterval(gameState.intervalId);
+    timeOuts.map(tiId=>clearTimeout(tiId));
+    timeOuts = [];
     resetAppMod();
     resetRegState();
     resetGameState();
-    document.getElementById("gameBoard").innerHTML="";//throw away previous game's cards and all that
+    document.getElementById("gameBoard").innerHTML="";//throw away previous game's cards and all
+    document.getElementById("counterDiv").innerHTML="<span><h1>Observe the cards before they disappear</h1></span>";
+    nameInputRef.value = regState.nameInput;
+    cardInputRef.value = regState.cardsInput;
     setVisible();
 }
 
@@ -91,6 +100,7 @@ function main(){
         }
         e.target.value = regState.cardsInput;
     });
+    document.getElementById("resetGameBtn").addEventListener('click',e=>resetGame(nameInputRef,cardInputRef));
 }
 
 function pupulateBoard(numOfPairs){
@@ -121,7 +131,8 @@ function pupulateBoard(numOfPairs){
     }
     const counterDiv = document.getElementById('counterDiv');
     populateHTML(gameBoard);
-    setTimeout(()=>initiateGameplay(counterDiv),setTimeForInterval(DEFAULT_OBSERVANCE_PREIOD));
+    const tiId = setTimeout(()=>initiateGameplay(counterDiv),setTimeForInterval(DEFAULT_OBSERVANCE_PREIOD));
+    timeOuts.push(tiId);
     /*
     *const sortedIndexes =[];
     cards.map(card=>sortedIndexes.push(card.otherCardIndex));
@@ -134,7 +145,7 @@ function initiateGameplay(counterDiv){
     cards.forEach(card=> { 
         card.htmlRef.style="";
         card.htmlRef.addEventListener('click',cardClick);});
-    setInterval(()=>{
+    gameState.intervalId = setInterval(()=>{
         gameState.remainingSeconds = gameState.remainingSeconds>0? gameState.remainingSeconds-1:0;
         counterDiv.innerHTML=`<span><h1>Game started. Remaining Time: ${gameState.remainingSeconds} seconds<h1></span>`;
     },setTimeForInterval(1));
@@ -188,9 +199,10 @@ function cardClick(e){
 
 function showCardForAwhile(card){
     card.htmlRef.style = `background-image: url('./images/image${card.value}.jpg');`;
-    setTimeout(()=>{
+    const tiId = setTimeout(()=>{
         if(card.discovered==false){
             card.htmlRef.style="";
         }
     },setTimeForInterval(DEFAULT_OBSERVANCE_PREIOD));
+    timeOuts.push(tiId);
 }
