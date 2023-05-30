@@ -13,6 +13,12 @@ const regState = {
     redirected: false
 };
 
+function resetRegState(){
+    regState.nameInput = "";
+    regState.cardsInput = DEFAULT_CARD_NUM;
+    regState.redirected = false;
+}
+
 const gameState = {
     remainingSeconds: DEFAULT_REMAINING_TIME,
     cards:[],
@@ -21,21 +27,41 @@ const gameState = {
     selectedCard2:null
 }
 
+function resetGameState(){
+    gameState.remainingSeconds = DEFAULT_REMAINING_TIME;
+    gameState.cards = [];
+    gameState.selectedMode = 0;
+    gameState.selectedCard1 = null;
+    gameState.selectedCard2 = null;
+}
+
 const appMod = {
     gameState: REG_MODE
 }
 
+function resetAppMod(){
+    appMod.gameState = REG_MODE;
+}
+
+function resetGame(){
+    resetAppMod();
+    resetRegState();
+    resetGameState();
+    document.getElementById("gameBoard").innerHTML="";//throw away previous game's cards and all that
+    setVisible();
+}
+
 function setVisible(){
     const register = document.getElementById("register");
-    const gameBoard = document.getElementById("gameBoard");
+    const gameContainer = document.getElementById("gameContainer");
     const {gameState} = appMod;
     if(gameState == REG_MODE){
         register.classList.remove("invisible");
-        gameBoard.classList.add("invisible");
+        gameContainer.classList.add("invisible");
     }
     else{
         if(gameState == GAME_MODE){
-            gameBoard.classList.remove("invisible");
+            gameContainer.classList.remove("invisible");
             register.classList.add("invisible");
         }
     }
@@ -89,16 +115,11 @@ function pupulateBoard(numOfPairs){
         let index1 = findAvailableRandomIndex(unAssingedIndexes);
         let index2 = findAvailableRandomIndex(unAssingedIndexes);
         let image = findAvailableRandomIndex(unAssignedImages);
-        cards[index1] = {otherCardIndex:index2,value:image+1};
-        cards[index2] = {otherCardIndex:index1,value:image+1};
+        cards[index1] = {otherCardIndex:index2,value:image+1,discovered:false};
+        cards[index2] = {otherCardIndex:index1,value:image+1,discovered:false};
         assignedAmount++;
     }
-    const counterDiv = document.createElement('div');
-    counterDiv.setAttribute('id','remaining-time');
-    counterDiv.classList.add('outlinedText');
-    counterDiv.classList.add('flex-center');
-    counterDiv.innerHTML=`<span><h1>Observe the cards before they disappear</h1></span>`;
-    document.getElementById("gameContainer").insertBefore(counterDiv,gameBoard);
+    const counterDiv = document.getElementById('counterDiv');
     populateHTML(gameBoard);
     setTimeout(()=>initiateGameplay(counterDiv),setTimeForInterval(DEFAULT_OBSERVANCE_PREIOD));
     /*
@@ -158,6 +179,8 @@ function cardClick(e){
         if(cards[selectedCard1.otherCardIndex] == selectedCard2){
             selectedCard1.htmlRef.style = `background-image: url('./images/image${selectedCard1.value}.jpg');`;
             selectedCard2.htmlRef.style = `background-image: url('./images/image${selectedCard2.value}.jpg');`;
+            selectedCard1.discovered = true;
+            selectedCard2.discovered = true;
         }
     }
     gameState.selectedMode = (selectedMode+1)%2;
@@ -166,6 +189,8 @@ function cardClick(e){
 function showCardForAwhile(card){
     card.htmlRef.style = `background-image: url('./images/image${card.value}.jpg');`;
     setTimeout(()=>{
-        card.htmlRef.style="";
+        if(card.discovered==false){
+            card.htmlRef.style="";
+        }
     },setTimeForInterval(DEFAULT_OBSERVANCE_PREIOD));
 }
